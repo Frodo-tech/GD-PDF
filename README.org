@@ -7,6 +7,14 @@ This module allows Godot Engine to create PDF files using LibHARU. Its provides
 an API to create PDF documents in the Godot Engine. It also offers bindings for
 using the API in GDScript.
 
+* Support
+
+Revisions up to commit [[https://github.com/francogarcia/GD-PDF/commit/183216b1815d5e564c07b0fbf24bc2e073ea2cab][183216b1815d5e564c07b0fbf24bc2e073ea2cab]] work with
+Godot 2.
+
+Revisions starting from commit [[https://github.com/francogarcia/GD-PDF/commit/e2d45984026d8b4ed1dcbd86e33e19c9aa82f3d6][e2d45984026d8b4ed1dcbd86e33e19c9aa82f3d6]] work
+with Godot 3.5 -- thanks to [[https://github.com/Frodo-tech][Frodo-tech]], who has kindly updated this project.
+
 * Example
 
 #+BEGIN_SRC godot-gdscript
@@ -15,13 +23,22 @@ pdf.create_document("/tmp/DejaVuSans.ttf", "/tmp/DejaVuSerif.ttf")
 
 pdf.add_new_page()
 pdf.add_title("Document Title")
-pdf.add_header("My Header")
+# pdf.add_header("My Header")
 pdf.add_body_text("The quick brown fox jumps over the lazy dog.")
+pdf.add_body_text("The quick brown fox jumps over the lazy dog. 0123456789")
+pdf.add_body_text("Short sentence.")
+pdf.add_body_text("Longer sentence...")
+
+pdf.add_header("My Section")
+pdf.add_body_text("Section 1")
+
+pdf.add_header("Another Section")
+pdf.add_body_text("Section 2 with some text.")
 
 pdf.add_new_page()
 pdf.add_title("Write 10 times...")
 for i in range(10):
-    pdf.add_body_text("The quick brown fox jumps over the lazy dog.")
+	pdf.add_body_text(str(i + 1) + " The quick brown fox jumps over the lazy dog.")
 
 pdf.save_document("/tmp/my_doc.pdf")
 pdf.finish_document()
@@ -29,9 +46,29 @@ pdf.finish_document()
 
 * Installation
 
-Clone or extract this project into Godot's ~module~ directory. Then follow the
-instructions to build LibHARU in your platform. It is important that the header
-=libharu/include/hpdf_config.h= exists; otherwise, the compilation will fail.
+This project has been originally implemented for Godot 2, which required
+plug-ins to be compiled with the engine. As such, support for Godot 3.5 still
+requires compiling the engine. For more information, refer to the section
+"Compiling" pages in the [[https://docs.godotengine.org/en/stable/development/compiling/index.html][Godot Engine Documentation]].
+
+To fetch the source code:
+
+#+BEGIN_SRC bashh
+git clone -b 3.5 --single-branch https://github.com/godotengine/godot.git
+#+END_SRC
+
+Clone or extract this project into Godot's ~modules~ directory. For better
+support, consider removing the hyphen from the default directory name.
+
+#+BEGIN_SRC bash
+# cd /pathTo/Godot3.5/godot/
+cd modules/
+git clone https://github.com/francogarcia/GD-PDF gdpdf
+#+END_SRC
+
+Then follow the instructions to build LibHARU in your platform. It is important
+that the header =libharu/include/hpdf_config.h= exists; otherwise, the
+compilation will fail.
 
 For all platforms bellow, the steps assumes that LibHARU's source code is in
 this modules' =libharu= directory. To speed Godot's compilation, it is
@@ -44,9 +81,9 @@ In a shell, run:
 #+BEGIN_SRC sh
 git clone https://github.com/libharu/libharu libharu
 cd libharu
-./buildconf.sh
 # The next step generates the hpdf_config.h file.
-./configure
+# You may wish to configure the optional paths paths to ZLIB / LIBPNG.
+cmake .
 #+END_SRC
 
 Then build Godot:
@@ -81,8 +118,7 @@ scons platform=windows
 * Exporting Projects
 
 Compile the export templates using the steps outlined in the wiki. See the
-Compile section and pages in [[http://www.godotengine.org/projects/godot-engine/wiki/][Godot Engine - Documentation - OpenProject]] for more
-information.
+section "Compiling" in the [[https://docs.godotengine.org/en/stable/development/compiling/index.html][Godot Engine Documentation]] for more information.
 
 ** Linux
 
